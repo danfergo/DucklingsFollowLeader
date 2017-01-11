@@ -42,18 +42,18 @@ void onReceiveData(const sensor_msgs::PointCloud2 pointCloud2) {
     {
     }*/
 
-/*
+
     Mat mat = Mat(cloud.height, cloud.width, CV_8UC3, Scalar(255,0,0));
 
     for (int i = 0; i < cloud.height; i++) {
         for (int j = 0; j < cloud.width; j++) {
            // cout << cloud.at(j,300).x << " ";
-            float x = (cloud.at(j,i).x*256);
+            float x = (cloud.at(j,i).z*50);
 
             if(x > 255){
                 mat.at<Vec3b>(Point(j,i)) = Vec3b(0,0,255);
             }else{
-                mat.at<Vec3b>(Point(j,i)) = Vec3b(x,0,0);
+                mat.at<Vec3b>(Point(j,i)) = Vec3b(x,x,0);
             }
 
         }
@@ -61,7 +61,7 @@ void onReceiveData(const sensor_msgs::PointCloud2 pointCloud2) {
 
     imshow("Depth view", mat);
     waitKey(1);
-*/
+
     //  cout << "fields size: " << pointCloud2.fields
 
     //ROS_INFO_STREAM(out);
