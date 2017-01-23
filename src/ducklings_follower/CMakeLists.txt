@@ -6,9 +6,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(PCL 1.6 REQUIRED)
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs geometry_msgs)
 find_package(OpenCV REQUIRED)
+find_package(PCL 1.6 REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -117,29 +117,45 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a C++ library
-# add_library(ducklings_follower
-#   src/${PROJECT_NAME}/ducklings_follower.cpp
-# )
+add_library(ducklings_follower
+   src/${PROJECT_NAME}/Agent.cpp
+   src/${PROJECT_NAME}/Geometry.cpp
+   src/${PROJECT_NAME}/Trajectory.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(ducklings_follower ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ducklings_follower ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 add_executable(listener listener.cpp)
+add_executable(walker walker.cpp)
+
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(ducklings_follower_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(listener
+target_link_libraries(ducklings_follower
         ${catkin_LIBRARIES}
         ${OpenCV_LIBS}
         ${PCL_LIBRARIES}
         )
 
+target_link_libraries(listener
+        ducklings_follower
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBS}
+        ${PCL_LIBRARIES}
+        )
+
+target_link_libraries(walker
+        ducklings_follower
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBS}
+        )
 
 #############
 ## Install ##
