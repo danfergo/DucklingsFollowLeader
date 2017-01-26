@@ -14,8 +14,9 @@
         <arg name="world_name" value="$(arg world_file)"/>
     </include>
 
+
     <group ns="robot1">
-         <param name="tf_prefix" value="robot1_tf"/>
+        <param name="tf_prefix" value="robot1_tf"/>
         <include file="$(find ducklings_gazebo)/launch/includes/$(arg base).launch.xml">
             <arg name="base" value="$(arg base)"/>
             <arg name="stacks" value="$(arg stacks)"/>
@@ -29,9 +30,9 @@
         <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
             <param name="publish_frequency" type="double" value="30.0"/>
         </node>
-<!--
+
         <node pkg="tf" type="static_transform_publisher" name="base_ref" args="0 0 0 0 0 0 /odom /robot1_tf/odom 100" />
--->
+
         <!-- Fake laser -->
         <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
         <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan"
@@ -43,8 +44,19 @@
             <remap from="scan" to="/scan"/>
         </node>
 
-    </group>
 
+        <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+          <param name="output_frame" value="odom"/>
+          <param name="freq" value="30.0"/>
+          <param name="sensor_timeout" value="1.0"/>
+          <param name="odom_used" value="true"/>
+          <param name="imu_used" value="true"/>
+          <param name="vo_used" value="true"/>
+          <param name="debug" value="false"/>
+          <param name="self_diagnose" value="false"/>
+        </node>
+
+    </group>
 
     <group ns="robot2">
         <param name="tf_prefix" value="robot2_tf"/>

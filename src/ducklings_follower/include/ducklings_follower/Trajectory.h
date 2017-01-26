@@ -2,7 +2,12 @@
 #define TRAJECTORY_H
 
 #include <iostream>
+
 #include <opencv2/core/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include <geometry_msgs/Twist.h>
 
 using namespace std;
@@ -14,19 +19,28 @@ public:
     static int const LINE = 0;
     static int const ELIPSE = 1;
 private:
-    int trajectoryType;
-    int duration;
+    int trajectoryType = -1;
     int alpha = 0;
-    int r1, r2;
+    double r1, r2;
 
-    int elapsedAlpha;
     int elapsedDuration;
+    double currentAngle;
+
+    bool active = false;
+    Point2d startPosition, centerPosition, currentPosition, endPosition;
+    double startYaw, currentYaw;
+    int dir;
+
+    int distance;
+    double duration;
+
 public:
     Trajectory();
-    Trajectory(int duration, int alpha);
-    Trajectory(int duration, int r1, int r2);
+    Trajectory(int distance, int alpha);
+    Trajectory(int distance, double r1, double r2, bool clockWise);
+    bool updateState(double xx, double yy, double yaw);
     bool walk(geometry_msgs::Twist & twist);
-    void restart();
+    void stop();
 };
 
 

@@ -1,5 +1,11 @@
 <launch>
-    <arg name="robot_name"/>
+<arg name="base" value="$(optenv TURTLEBOT_BASE kobuki)"/> <!-- create, roomba -->
+<arg name="stacks" value="$(optenv TURTLEBOT_STACKS hexagons)"/>  <!-- circles, hexagons -->
+<arg name="3d_sensor" value="$(optenv TURTLEBOT_3D_SENSOR kinect)"/>  <!-- kinect, asus_xtion_pro -->
+
+
+
+<!--    <arg name="robot_name"/>
     <arg name="init_pose"/>
 
     <node name="spawn_minibot_model" pkg="gazebo_ros" type="spawn_model"
@@ -8,7 +14,7 @@
 
     <node pkg="robot_state_publisher" type="state_publisher"
           name="robot_state_publisher" output="screen"/>
-
+-->
     <!-- The odometry estimator, throttling, fake laser etc. go here -->
     <!-- All the stuff as from usual robot launch file -->
 </launch>

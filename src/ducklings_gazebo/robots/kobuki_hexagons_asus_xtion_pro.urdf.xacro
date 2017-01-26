@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+    - Base      : kobuki
+    - Stacks    : hexagons
+    - 3d Sensor : kinect
+-->    
+<robot name="turtlebot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_library.urdf.xacro" />
+
+    <xacro:macro name="addon" params="parent">
+        <joint name="top_circle_joint" type="fixed">
+            <child link="top_circle"/>
+            <parent link="${parent}"/>
+        </joint>
+
+        <joint name="marker_joint" type="fixed">
+            <child link="marker"/>
+            <parent link="${parent}"/>
+        </joint>
+
+        <link name="top_circle">
+            <visual>
+                <origin xyz="0 0 0.375" rpy="0 0 0"/>
+                <geometry>
+                  <cylinder length="0.05" radius="0.176"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="marker">
+            <visual>
+                <origin xyz="-0.1 0 0.45" rpy="0 0 0"/>
+                <geometry>
+                  <cylinder length="0.1" radius="0.07"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <gazebo reference="top_circle">
+          <material>Gazebo/Black</material>
+        </gazebo>
+
+        <gazebo reference="marker">
+          <material>Gazebo/Red</material>
+        </gazebo>
+
+    </xacro:macro>
+
+
+  <kobuki/>
+  <stack_hexagons                 parent="base_link"/>
+  <sensor_asus_xtion_pro          parent="base_link"/>
+  <addon                          parent="base_link"/>
+
+
+
+
+
+
+
+
+
+</robot>

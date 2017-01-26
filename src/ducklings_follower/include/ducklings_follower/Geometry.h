@@ -8,12 +8,12 @@ using namespace cv;
 class Geometry{
 
 public:
-    static float angleBetween(const Point2f &v1, const Point2f &v2);
-    static float norm(const Point2f &p);
-    static float distance(const Point2f &v1, const Point2f &v2);
-    static Point2f normalized(const Point2f &p);
-
-
+    static double angleBetween(const Point2d &v1, const Point2d &v2);
+    static double angleBetween2(const Point2d &v1, const Point2d &v2);
+    static double norm(const Point2d &p);
+    static double distance(const Point2d &v1, const Point2d &v2);
+    static Point2d normalized(const Point2d &p);
+    static Point2d rotate(const Point2d & v, double angle);
 };
 
 

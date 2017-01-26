@@ -3,14 +3,23 @@ project(ducklings_follower)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+# For some reason, openCV  & qtcreator won't work without this.
+set(QT_VERSION_REQ "5.7")
+find_package(Qt5Core ${QT_VERSION_REQ} REQUIRED)
+find_package(Qt5Quick ${QT_VERSION_REQ} REQUIRED)
+find_package(Qt5Widgets ${QT_VERSION_REQ} REQUIRED)
+set(CMAKE_AUTOMOC ON)
+
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs geometry_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp tf sensor_msgs geometry_msgs nav_msgs)
 find_package(OpenCV REQUIRED)
 find_package(PCL 1.6 REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -126,7 +135,7 @@ add_library(ducklings_follower
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-add_dependencies(ducklings_follower ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(ducklings_follower ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 add_executable(listener listener.cpp)
