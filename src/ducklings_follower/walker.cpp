@@ -33,6 +33,7 @@ void onReceiveOdom(const geometry_msgs::PoseWithCovarianceStamped odometry){
   double yaw = tf::getYaw(odometry.pose.pose.orientation);
 
   if(trajectories[currentTrajectory].updateState(xx, yy, yaw)){
+      trajectories[currentTrajectory].stop();
       currentTrajectory = (++currentTrajectory)%(trajectories.size());
   }
 }
@@ -52,14 +53,14 @@ int main(int argc, char **argv) {
     publisher = nh.advertise<geometry_msgs::Twist>("/robot1/cmd_vel_mux/input/teleop", 10);
 
     trajectories.push_back(Trajectory(4, 0));
-    trajectories.push_back(Trajectory(2, 2, 2, false));
-    trajectories.push_back(Trajectory(2, 2, 3, true));
+    //trajectories.push_back(Trajectory(2, 2, 2, false));
+    //trajectories.push_back(Trajectory(2, 2, 3, true));
 
 
     ROS_INFO_STREAM("Walking.");
 
 
-    ros::Rate r(1);
+    ros::Rate r(2);
     while (ros::ok()) {
         ros::spinOnce();
         walk();

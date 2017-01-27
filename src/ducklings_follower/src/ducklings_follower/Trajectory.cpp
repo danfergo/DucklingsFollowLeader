@@ -2,6 +2,9 @@
 #include <ducklings_follower/Geometry.h>
 #include <iostream>
 
+#define FRAME_RATE  2
+
+
 Trajectory::Trajectory(){
 
 }
@@ -9,7 +12,7 @@ Trajectory::Trajectory(){
 Trajectory::Trajectory(int distance, int alpha): distance(distance), alpha(alpha)
 {
    trajectoryType = 0; // linear
-   duration = 5*distance;
+   duration = 10*distance*FRAME_RATE;
    stop();
 }
 
@@ -17,7 +20,7 @@ Trajectory::Trajectory(int distance, double r1, double r2, bool clockWise): dist
 {
   trajectoryType = 1; // elipse
   dir = clockWise ? 1 : -1;
-  duration = 180;
+  duration = 180*FRAME_RATE;
   stop();
 }
 
@@ -167,4 +170,5 @@ bool Trajectory::walk(geometry_msgs::Twist &twist)
 void Trajectory::stop()
 {
   active = false;
+  elapsedDuration = 0;
 }
