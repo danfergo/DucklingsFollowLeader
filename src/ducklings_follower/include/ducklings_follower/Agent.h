@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 
 #include <opencv2/core/core.hpp>
@@ -24,6 +25,8 @@
 
 #include <vector>
 
+#include <ducklings_follower/Trajectory.h>
+
 using namespace std;
 using namespace pcl;
 using namespace ros;
@@ -33,25 +36,26 @@ using namespace cv;
 class Agent {
     
     sensor_msgs::PointCloud2 tmpPointCloud2;
-
+    vector<Trajectory> trajectories;
+    int currentTrajectory = 0;
 private:
 
     bool whatPointCloud(PointCloud <pcl::PointXYZ> & cloud);
     void buildViews(const PointCloud <pcl::PointXYZ> & cloud, Mat & frontalDepthView, Mat & topView, PointXYZ & delta);
-
     void detectTurtlebots(const Mat & topView, vector<Vec3f> & circles);
-
     bool walk(const vector<Vec3f> & circles,  PointXYZ & delta, geometry_msgs::Twist & twist);
-
     void showViews(const Mat & frontalDepthView, const Mat & topView, const vector<Vec3f> & circles ,  PointXYZ & delta);
 
 public:
     Agent();
     void init();
 
-    bool body(geometry_msgs::Twist & twist);
+    bool follow(geometry_msgs::Twist & twist);
+    bool walk(geometry_msgs::Twist & twist);
 
     void setDepthView(const sensor_msgs::PointCloud2 pointCloud2);
+    void setOdometry(const geometry_msgs::PoseWithCovarianceStamped odom);
+    void setTrajectories(vector<Trajectory> trajectories);
 };
 
 

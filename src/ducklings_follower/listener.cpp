@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
         ros::spinOnce();
 
         geometry_msgs::Twist tw;
-        if(agent.body(tw)){
+        if(agent.follow(tw)){
           publisher.publish(tw);
         }
 

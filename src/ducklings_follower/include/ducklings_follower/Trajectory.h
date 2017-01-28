@@ -10,6 +10,9 @@
 
 #include <geometry_msgs/Twist.h>
 
+#define LINEAR_TRAJECTORY  0
+#define ELLIPSE_TRAJECTORY 1
+
 using namespace std;
 using namespace cv;
 
@@ -20,13 +23,12 @@ public:
     static int const ELIPSE = 1;
 private:
     int trajectoryType = -1;
-    int alpha = 0;
-    double r1, r2;
+    bool active = false;
 
+    double r1, r2;
     int elapsedDuration;
     double currentAngle;
 
-    bool active = false;
     Point2d startPosition, centerPosition, currentPosition, endPosition;
     double startYaw, currentYaw;
     int dir;
@@ -36,11 +38,12 @@ private:
 
 public:
     Trajectory();
-    Trajectory(int distance, int alpha);
-    Trajectory(int distance, double r1, double r2, bool clockWise);
     bool updateState(double xx, double yy, double yaw);
-    bool walk(geometry_msgs::Twist & twist);
+    void walk(geometry_msgs::Twist & twist);
     void stop();
+
+    static Trajectory createLineTrajectory(int distance);
+    static Trajectory createEllipseTrajectory(double r1, double r2, bool clockWise);
 };
 
 

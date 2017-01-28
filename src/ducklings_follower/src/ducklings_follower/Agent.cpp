@@ -1,6 +1,7 @@
 #include <ducklings_follower/Agent.h>
 
 #include <ducklings_follower/Geometry.h>
+#include <tf/transform_datatypes.h>
 
 
 Agent::Agent(){
@@ -13,7 +14,7 @@ void Agent::init(){
 
 int scale = 100.f;
 
-bool Agent::body(geometry_msgs::Twist & twist)
+bool Agent::follow(geometry_msgs::Twist & twist)
 {
   PointCloud <pcl::PointXYZ> cloud;
   if(whatPointCloud(cloud)){
@@ -29,7 +30,12 @@ bool Agent::body(geometry_msgs::Twist & twist)
       return true;
   }
 
-   return true;
+  return true;
+}
+
+bool Agent::walk(geometry_msgs::Twist &twist)
+{
+  trajectories[currentTrajectory].walk(twist);
 }
 
 
@@ -132,7 +138,24 @@ bool Agent::walk(const vector<Vec3f> & circles, PointXYZ & delta, geometry_msgs:
 
 
 void Agent::setDepthView(const sensor_msgs::PointCloud2 pointCloud2){
-    tmpPointCloud2 = pointCloud2;
+  tmpPointCloud2 = pointCloud2;
+}
+
+void Agent::setOdometry(const geometry_msgs::PoseWithCovarianceStamped odometry)
+{
+  double xx = odometry.pose.pose.position.x;
+  double yy = odometry.pose.pose.position.y;
+  double yaw = tf::getYaw(odometry.pose.pose.orientation);
+
+  if(trajectories[currentTrajectory].updateState(xx, yy, yaw)){
+      trajectories[currentTrajectory].stop();
+      currentTrajectory = (++currentTrajectory)%(trajectories.size());
+  }
+}
+
+void Agent::setTrajectories(vector<Trajectory> trajectories)
+{
+  this->trajectories = trajectories;
 }
 
 void Agent::showViews(const Mat & frontalDepthView, const Mat & topView, const vector<Vec3f> & circles,  PointXYZ & delta){
