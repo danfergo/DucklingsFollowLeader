@@ -56,6 +56,12 @@
           <param name="self_diagnose" value="false"/>
         </node>
 
+        <node pkg="ducklings_follower" type="walker" name="walker">
+            <rosparam param="trajectories">
+                [[4],[2.0,2.0,false],[2.0,3.0,true]]
+            </rosparam>
+        </node>
+
     </group>
 
     <group ns="robot2">

@@ -50,10 +50,38 @@ int main(int argc, char **argv) {
 
     publisher = nh.advertise<geometry_msgs::Twist>("/robot1/cmd_vel_mux/input/teleop", 10);
 
+    XmlRpc::XmlRpcValue v;
+    nh.param(ros::this_node::getName() + "/trajectories", v, v);
+    for(int i =0; i < v.size(); i++)
+    {
+        if(v[i].getType()==XmlRpc::XmlRpcValue::TypeArray) {
+            if(v[i].size()==1 &&
+                v[i][0].getType()==XmlRpc::XmlRpcValue::TypeInt) { // linear - distance
+                trajectories.push_back(Trajectory::createLineTrajectory(v[i][0]));
+            }
+            else if(v[i].size()==3 &&
+                v[i][0].getType()==XmlRpc::XmlRpcValue::TypeDouble &&
+                v[i][1].getType()==XmlRpc::XmlRpcValue::TypeDouble &&
+                v[i][2].getType()==XmlRpc::XmlRpcValue::TypeBoolean) { // elipse - distance, r1, r2, clockwise
+                trajectories.push_back(Trajectory::createEllipseTrajectory((v[i][0]), v[i][1], v[i][2]));
+            }
+            else {
+                cout << "Invalid Trajectory!(size=" << v[i].size() << ";types:";
+                for(unsigned int j=0; j < v[i].size(); j++) {
+                    cout << "[" << j << "]=" << v[i][j].getType();
+                    if(j!=v[i].size()-1) cout << ",";
+                }
+                cout << ")" << endl;
+            }
+        }
 
+        //cout << "params: " << v[i] << endl;
+    }
 
-    trajectories.push_back(Trajectory::createLineTrajectory(4));
-    trajectories.push_back(Trajectory::createEllipseTrajectory(2, 2, false));
+    //cout << "trajectories.size(): " << trajectories.size() << endl;
+
+    //trajectories.push_back(Trajectory::createLineTrajectory(4));
+    //trajectories.push_back(Trajectory::createEllipseTrajectory(2, 2, false));
     //trajectories.push_back(Trajectory(2, 2, 3, true));
 
 
