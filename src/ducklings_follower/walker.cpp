@@ -13,6 +13,8 @@
 #include <ducklings_follower/Agent.h>
 
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <sensor_msgs/PointCloud2.h>
+
 #include <vector>
 
 using namespace std;
@@ -22,12 +24,10 @@ using namespace cv;
 ros::Publisher publisher;
 Agent agent;
 
-vector<Trajectory> trajectories;
-int currentTrajectory = 0;
-/*
-void onReceivePointCloud2(const geometry_msgs::PointCloud2 pointCloud2){
 
-}*/
+void onReceivePointCloud2(const sensor_msgs::PointCloud2 pointCloud2){
+    agent.setDepthView(pointCloud2);
+}
 
 void onReceiveOdom(const geometry_msgs::PoseWithCovarianceStamped odometry){
     agent.setOdometry(odometry);
@@ -35,7 +35,9 @@ void onReceiveOdom(const geometry_msgs::PoseWithCovarianceStamped odometry){
 
 void walk(){
     geometry_msgs::Twist tw;
-    agent.walk(tw);
+    if(!agent.watch(tw)){
+      agent.walk(tw);
+    }
     publisher.publish(tw);
 }
 
@@ -46,9 +48,10 @@ int main(int argc, char **argv) {
     ROS_INFO_STREAM("Wake up.");
 
     ros::Subscriber sub = nh.subscribe("/robot1/robot_pose_ekf/odom_combined", 1, &onReceiveOdom);
-    //ros::Subscriber sub2 = nh.subscribe("/robot1/camera/depth/points", 1, &onReceivePointCloud2);
+    ros::Subscriber sub2 = nh.subscribe("/robot1/camera/depth/points", 1, &onReceivePointCloud2);
 
     publisher = nh.advertise<geometry_msgs::Twist>("/robot1/cmd_vel_mux/input/teleop", 10);
+    vector<Trajectory> trajectories;
 
     XmlRpc::XmlRpcValue v;
     nh.param(ros::this_node::getName() + "/trajectories", v, v);
@@ -66,12 +69,12 @@ int main(int argc, char **argv) {
                 trajectories.push_back(Trajectory::createEllipseTrajectory((v[i][0]), v[i][1], v[i][2]));
             }
             else {
-                cout << "Invalid Trajectory!(size=" << v[i].size() << ";types:";
+             //   cout << "Invalid Trajectory!(size=" << v[i].size() << ";types:";
                 for(unsigned int j=0; j < v[i].size(); j++) {
-                    cout << "[" << j << "]=" << v[i][j].getType();
+               //     cout << "[" << j << "]=" << v[i][j].getType();
                     if(j!=v[i].size()-1) cout << ",";
                 }
-                cout << ")" << endl;
+             //   cout << ")" << endl;
             }
         }
 

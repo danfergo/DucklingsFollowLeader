@@ -56,7 +56,7 @@
           <param name="self_diagnose" value="false"/>
         </node>
 
-        <node pkg="ducklings_follower" type="walker" name="walker">
+        <node pkg="ducklings_follower" type="walker" name="walker" output="screen">
             <rosparam param="trajectories">
                 [[4],[2.0,2.0,false],[2.0,3.0,true]]
             </rosparam>
@@ -92,6 +92,8 @@
             <remap from="image" to="/camera/depth/image_raw"/>
             <remap from="scan" to="/scan"/>
         </node>
+
+        <node pkg="ducklings_follower" type="listener" name="listener2" />
 
     </group>
 

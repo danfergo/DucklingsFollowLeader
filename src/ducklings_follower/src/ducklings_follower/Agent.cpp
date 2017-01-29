@@ -2,6 +2,9 @@
 
 #include <ducklings_follower/Geometry.h>
 #include <tf/transform_datatypes.h>
+#include <ctime>
+
+std::time_t INIT_TIME = std::time(nullptr);
 
 
 Agent::Agent(){
@@ -16,6 +19,8 @@ int scale = 100.f;
 
 bool Agent::follow(geometry_msgs::Twist & twist)
 {
+  if(!existsPointCloud) return true;
+
   PointCloud <pcl::PointXYZ> cloud;
   if(whatPointCloud(cloud)){
       Mat frontalDepthView;
@@ -105,6 +110,7 @@ void Agent::detectTurtlebots(const Mat & topView, vector<Vec3f> & circles)
 }
 
 bool Agent::walk(const vector<Vec3f> & circles, PointXYZ & delta, geometry_msgs::Twist & twist){
+  if(!existsOdom) return true;
 
   geometry_msgs::Twist tw;
 
@@ -139,6 +145,7 @@ bool Agent::walk(const vector<Vec3f> & circles, PointXYZ & delta, geometry_msgs:
 
 void Agent::setDepthView(const sensor_msgs::PointCloud2 pointCloud2){
   tmpPointCloud2 = pointCloud2;
+  existsPointCloud = true;
 }
 
 void Agent::setOdometry(const geometry_msgs::PoseWithCovarianceStamped odometry)
@@ -151,6 +158,7 @@ void Agent::setOdometry(const geometry_msgs::PoseWithCovarianceStamped odometry)
       trajectories[currentTrajectory].stop();
       currentTrajectory = (++currentTrajectory)%(trajectories.size());
   }
+  existsOdom = true;
 }
 
 void Agent::setTrajectories(vector<Trajectory> trajectories)
@@ -186,3 +194,13 @@ void Agent::showViews(const Mat & frontalDepthView, const Mat & topView, const v
     waitKey(1);
   }
 }
+
+bool Agent::watch(geometry_msgs::Twist & twist){
+  /*std::time_t now = std::time(nullptr);
+  if(now - INIT_TIME > 10){
+    twist.angular.z = 0.5f;
+    return true;
+  }*/
+  return false;
+}
+

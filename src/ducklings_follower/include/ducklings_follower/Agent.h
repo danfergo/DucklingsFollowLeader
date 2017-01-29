@@ -38,6 +38,8 @@ class Agent {
     sensor_msgs::PointCloud2 tmpPointCloud2;
     vector<Trajectory> trajectories;
     int currentTrajectory = 0;
+    bool existsPointCloud;
+    bool existsOdom;
 private:
 
     bool whatPointCloud(PointCloud <pcl::PointXYZ> & cloud);
@@ -52,6 +54,7 @@ public:
 
     bool follow(geometry_msgs::Twist & twist);
     bool walk(geometry_msgs::Twist & twist);
+    bool watch(geometry_msgs::Twist & twist);
 
     void setDepthView(const sensor_msgs::PointCloud2 pointCloud2);
     void setOdometry(const geometry_msgs::PoseWithCovarianceStamped odom);
