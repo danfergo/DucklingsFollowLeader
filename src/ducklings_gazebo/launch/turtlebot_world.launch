@@ -58,7 +58,7 @@
 
         <node pkg="ducklings_follower" type="walker" name="walker" output="screen">
             <rosparam param="trajectories">
-                [[2.5,2.5,false],[2.5,2.5,true]]
+                [[2.5,2.5,false],[2.5,3.0,true]]
             </rosparam>
         </node>
 
