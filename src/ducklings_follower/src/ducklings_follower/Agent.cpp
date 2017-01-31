@@ -21,7 +21,7 @@ int scale = 100.f;
 
 bool Agent::follow(geometry_msgs::Twist & twist)
 {
-  if(!existsPointCloud) return false;
+  if(!existsPointCloud || cloud.width == 0 || cloud.height == 0) return false;
 
   Mat frontalDepthView;
   Mat topView;
@@ -42,6 +42,8 @@ bool Agent::walkTrajectory(geometry_msgs::Twist &twist)
 
 
 void Agent::buildViews(const PointCloud <pcl::PointXYZ> & cloud, Mat & frontalDepthView, Mat & topView, PointXYZ & delta){
+
+  if(cloud.width == 0 || cloud.height == 0) return;
 
   PointXYZ  min, max;
   PointXYZ O = PointXYZ(0,0,0);
@@ -94,37 +96,49 @@ void Agent::detectTurtlebots(const Mat & topView, vector<Vec3f> & circles)
 }
 
 bool Agent::walkToward(const vector<Vec3f> & circles, PointXYZ & delta, geometry_msgs::Twist & twist){
-  if(!existsPointCloud) return false;
+  if(!existsPointCloud || circles.size() == 0) return false;
 
   geometry_msgs::Twist tw;
 
+  double minD = 999999;
+  int minI = 0;
+
   for(size_t i = 0; i < circles.size(); i++ ){
-      Vec3f c = circles[i];
+    Vec3f c = circles[i];
 
-      Point2d C = Point2d(c[0], c[1]);
-      Point2d O = scale*Point2d(delta.x, delta.z);
-      Point2d F = scale*Point2d(delta.x, delta.z+1);
-
-      Point2d nOF = Geometry::normalized(F - O);
-      Point2d nOC = Geometry::normalized(C - O);
-      double angle = -1*Geometry::angleBetween2(nOC, nOF);
-      double dst = Geometry::norm(C - O)/scale;
-
-      double stopLine = 1.30f;
-      double margin = 0.05f;
-
-       cout << dst << endl;
-
-
-      tw.linear.x =  dst > stopLine ? (dst - stopLine) : ( dst < (stopLine - margin) ? (dst - stopLine) : 0.0f);
-      tw.angular.z = angle;
-
-
-      twist = tw;
-      return true;
+    Point2d C = Point2d(c[0], c[1]);
+    Point2d O = scale*Point2d(delta.x, delta.z);
+    double d = Geometry::norm(C - O)/scale;
+    if(d < minD){
+      minD = d;
+      minI =  i;
+    }
   }
 
-  return false;
+
+    Vec3f c = circles[minI];
+
+    Point2d C = Point2d(c[0], c[1]);
+    Point2d O = scale*Point2d(delta.x, delta.z);
+    Point2d F = scale*Point2d(delta.x, delta.z+1);
+
+    Point2d nOF = Geometry::normalized(F - O);
+    Point2d nOC = Geometry::normalized(C - O);
+    double angle = -1*Geometry::angleBetween2(nOC, nOF);
+    double dst = Geometry::norm(C - O)/scale;
+
+    double stopLine = 1.30f;
+    double margin = 0.05f;
+
+   //  cout << dst << endl;
+
+
+    tw.linear.x =  dst > stopLine ? (dst > 2.0 ? 2.0 : (dst - stopLine)) : ( dst < (stopLine - margin) ? (dst - stopLine) : 0.0f);
+    tw.angular.z = angle;
+
+
+    twist = tw;
+    return true;
 }
 
 

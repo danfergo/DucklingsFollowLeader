@@ -41,8 +41,8 @@ int main(int argc, char **argv) {
 
 
     ros::NodeHandle nh;
-    ros::Subscriber sub = nh.subscribe("/robot2/camera/depth/points", 1, &onReceivePointCloud2);
-    ros::Publisher publisher = nh.advertise<geometry_msgs::Twist>("/robot2/cmd_vel_mux/input/teleop", 10);
+    ros::Subscriber sub = nh.subscribe("camera/depth/points", 1, &onReceivePointCloud2);
+    ros::Publisher publisher = nh.advertise<geometry_msgs::Twist>("cmd_vel_mux/input/teleop", 10);
 
     ros::Rate r(30);
     while (ros::ok()) {

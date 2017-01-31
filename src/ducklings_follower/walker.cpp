@@ -47,10 +47,10 @@ int main(int argc, char **argv) {
 
     ROS_INFO_STREAM("Wake up.");
 
-    ros::Subscriber sub = nh.subscribe("/robot1/robot_pose_ekf/odom_combined", 1, &onReceiveOdom);
-    ros::Subscriber sub2 = nh.subscribe("/robot1/camera/depth/points", 1, &onReceivePointCloud2);
+    ros::Subscriber sub = nh.subscribe("robot_pose_ekf/odom_combined", 1, &onReceiveOdom);
+    ros::Subscriber sub2 = nh.subscribe("camera/depth/points", 1, &onReceivePointCloud2);
 
-    publisher = nh.advertise<geometry_msgs::Twist>("/robot1/cmd_vel_mux/input/teleop", 10);
+    publisher = nh.advertise<geometry_msgs::Twist>("cmd_vel_mux/input/teleop", 10);
     vector<Trajectory> trajectories;
 
     XmlRpc::XmlRpcValue v;
