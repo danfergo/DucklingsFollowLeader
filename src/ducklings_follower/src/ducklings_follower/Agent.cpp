@@ -184,7 +184,7 @@ void Agent::showViews(const Mat & frontalDepthView, const Mat & topView, const v
 }
 
 bool Agent::watch(geometry_msgs::Twist & twist){
-    if(!existsPointCloud) return false;
+    if(!existsPointCloud || !existsOdom) return false;
 
     std::time_t now = std::time(nullptr);
     if(watchingState == 0 && (now - lastWatchEnding < TIME_BETWEEN_WATCH)) return false;
