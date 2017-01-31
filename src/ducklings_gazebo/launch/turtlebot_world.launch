@@ -1,5 +1,5 @@
 <launch>
-    <arg name="world_file" default="$(find ducklings_gazebo)/worlds/empty.world"/>
+    <arg name="world_file" default="$(find ducklings_gazebo)/worlds/playground.world"/>
 
     <arg name="base" value="$(optenv TURTLEBOT_BASE kobuki)"/> <!-- create, roomba -->
     <arg name="battery" value="$(optenv TURTLEBOT_BATTERY /proc/acpi/battery/BAT0)"/>  <!-- /proc/acpi/battery/BAT0 -->
@@ -22,7 +22,7 @@
             <arg name="stacks" value="$(arg stacks)"/>
             <arg name="3d_sensor" value="$(arg 3d_sensor)"/>
 
-            <arg name="init_pose" value="-x 1 -y 1 -z 0"/>
+            <arg name="init_pose" value="-x 3 -y -2 -z 0"/>
             <arg name="robot_name" value="Robot1"/>
             <!-- <arg name="nspc" value="robot1"/> -->
         </include>
@@ -71,17 +71,29 @@
             <arg name="stacks" value="$(arg stacks)"/>
             <arg name="3d_sensor" value="$(arg 3d_sensor)"/>
 
-            <arg name="init_pose" value="-x -1 -y -2 -z 0"/>
+            <arg name="init_pose" value="-x 2 -y -2 -z 0"/>
             <arg name="robot_name" value="Robot2"/>
             <!-- <arg name="nspc" value="robot1"/> -->
         </include>
 
+        <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+          <param name="output_frame" value="odom"/>
+          <param name="freq" value="30.0"/>
+          <param name="sensor_timeout" value="1.0"/>
+          <param name="odom_used" value="true"/>
+          <param name="imu_used" value="true"/>
+          <param name="vo_used" value="true"/>
+          <param name="debug" value="false"/>
+          <param name="self_diagnose" value="false"/>
+        </node>
+
+
         <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
             <param name="publish_frequency" type="double" value="30.0"/>
         </node>
-        <!--
-                <node pkg="tf" type="static_transform_publisher" name="base_ref" args="0 0 0 0 0 0 /odom /robot1_tf/odom 100" />
-        -->
+
+        <node pkg="tf" type="static_transform_publisher" name="base_ref" args="0 0 0 0 0 0 /odom /robot1_tf/odom 100" />
+
         <!-- Fake laser -->
         <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
         <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan"

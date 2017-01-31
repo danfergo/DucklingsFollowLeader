@@ -36,7 +36,7 @@ void onReceiveOdom(const geometry_msgs::PoseWithCovarianceStamped odometry){
 void walk(){
     geometry_msgs::Twist tw;
     if(!agent.watch(tw)){
-      agent.walk(tw);
+      agent.walkTrajectory(tw);
     }
     publisher.publish(tw);
 }

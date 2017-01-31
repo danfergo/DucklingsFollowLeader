@@ -2,7 +2,6 @@
 #include <ducklings_follower/Geometry.h>
 #include <iostream>
 
-#define FRAME_RATE  2
 
 
 Trajectory::Trajectory(){
@@ -26,7 +25,7 @@ Trajectory Trajectory::createEllipseTrajectory(double r1, double r2, bool clockW
   trajectory.r2 = r2;
   trajectory.trajectoryType = ELLIPSE_TRAJECTORY; // elipse
   trajectory.dir = clockWise ? 1 : -1;
-  trajectory.duration = 180*FRAME_RATE;
+  trajectory.duration = 100*FRAME_RATE;
   trajectory.stop();
   return trajectory;
 }

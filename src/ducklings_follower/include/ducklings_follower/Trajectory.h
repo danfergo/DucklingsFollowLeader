@@ -12,6 +12,7 @@
 
 #define LINEAR_TRAJECTORY  0
 #define ELLIPSE_TRAJECTORY 1
+#define FRAME_RATE  2
 
 using namespace std;
 using namespace cv;

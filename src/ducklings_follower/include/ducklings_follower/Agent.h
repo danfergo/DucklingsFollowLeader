@@ -34,18 +34,24 @@ using namespace cv;
 
 
 class Agent {
-    
-    sensor_msgs::PointCloud2 tmpPointCloud2;
+    PointCloud <pcl::PointXYZ> cloud;
+    geometry_msgs::PoseWithCovarianceStamped odom;
+
+    geometry_msgs::PoseWithCovarianceStamped odomBeforeWatch;
+    int watchingState = 0;
+    long lastWatchEnding = 0;
+
+
     vector<Trajectory> trajectories;
     int currentTrajectory = 0;
+
     bool existsPointCloud;
     bool existsOdom;
 private:
 
-    bool whatPointCloud(PointCloud <pcl::PointXYZ> & cloud);
     void buildViews(const PointCloud <pcl::PointXYZ> & cloud, Mat & frontalDepthView, Mat & topView, PointXYZ & delta);
     void detectTurtlebots(const Mat & topView, vector<Vec3f> & circles);
-    bool walk(const vector<Vec3f> & circles,  PointXYZ & delta, geometry_msgs::Twist & twist);
+    bool walkToward(const vector<Vec3f> & circles,  PointXYZ & delta, geometry_msgs::Twist & twist);
     void showViews(const Mat & frontalDepthView, const Mat & topView, const vector<Vec3f> & circles ,  PointXYZ & delta);
 
 public:
@@ -53,7 +59,7 @@ public:
     void init();
 
     bool follow(geometry_msgs::Twist & twist);
-    bool walk(geometry_msgs::Twist & twist);
+    bool walkTrajectory(geometry_msgs::Twist & twist);
     bool watch(geometry_msgs::Twist & twist);
 
     void setDepthView(const sensor_msgs::PointCloud2 pointCloud2);

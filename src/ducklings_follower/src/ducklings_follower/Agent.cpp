@@ -4,11 +4,13 @@
 #include <tf/transform_datatypes.h>
 #include <ctime>
 
+#define TIME_BETWEEN_WATCH  30
+
 std::time_t INIT_TIME = std::time(nullptr);
 
 
 Agent::Agent(){
-
+  lastWatchEnding = INIT_TIME;
 }
 
 void Agent::init(){
@@ -19,26 +21,21 @@ int scale = 100.f;
 
 bool Agent::follow(geometry_msgs::Twist & twist)
 {
-  if(!existsPointCloud) return true;
+  if(!existsPointCloud) return false;
 
-  PointCloud <pcl::PointXYZ> cloud;
-  if(whatPointCloud(cloud)){
-      Mat frontalDepthView;
-      Mat topView;
-      PointXYZ delta;
-      vector<Vec3f> circles;
+  Mat frontalDepthView;
+  Mat topView;
+  PointXYZ delta;
+  vector<Vec3f> circles;
 
-      buildViews(cloud, frontalDepthView, topView, delta);
-      detectTurtlebots(topView, circles);
-      walk(circles, delta, twist);
-      showViews(frontalDepthView, topView, circles, delta);
-      return true;
-  }
-
+  buildViews(cloud, frontalDepthView, topView, delta);
+  detectTurtlebots(topView, circles);  
+  walkToward(circles, delta, twist);
+  showViews(frontalDepthView, topView, circles, delta);
   return true;
 }
 
-bool Agent::walk(geometry_msgs::Twist &twist)
+bool Agent::walkTrajectory(geometry_msgs::Twist &twist)
 {
   trajectories[currentTrajectory].walk(twist);
 }
@@ -90,27 +87,14 @@ void Agent::buildViews(const PointCloud <pcl::PointXYZ> & cloud, Mat & frontalDe
   topView = tView;
 }
 
-
-bool Agent::whatPointCloud(PointCloud <pcl::PointXYZ> & cloud)
-{
-  sensor_msgs::PointCloud2 ptcl = tmpPointCloud2;
-
-  PCLPointCloud2 pcl_pc;
-  pcl_conversions::toPCL(ptcl, pcl_pc);
-
-  fromPCLPointCloud2(pcl_pc, cloud);
-
-  return cloud.size() > 0;
-}
-
 void Agent::detectTurtlebots(const Mat & topView, vector<Vec3f> & circles)
 {
   double radius = (scale/5.35);
   HoughCircles(topView, circles, CV_HOUGH_GRADIENT, 1, radius-5, 10, 10, radius-3, radius+3);
 }
 
-bool Agent::walk(const vector<Vec3f> & circles, PointXYZ & delta, geometry_msgs::Twist & twist){
-  if(!existsOdom) return true;
+bool Agent::walkToward(const vector<Vec3f> & circles, PointXYZ & delta, geometry_msgs::Twist & twist){
+  if(!existsPointCloud) return false;
 
   geometry_msgs::Twist tw;
 
@@ -129,6 +113,7 @@ bool Agent::walk(const vector<Vec3f> & circles, PointXYZ & delta, geometry_msgs:
       double stopLine = 1.30f;
       double margin = 0.05f;
 
+       cout << dst << endl;
 
 
       tw.linear.x =  dst > stopLine ? (dst - stopLine) : ( dst < (stopLine - margin) ? (dst - stopLine) : 0.0f);
@@ -143,8 +128,10 @@ bool Agent::walk(const vector<Vec3f> & circles, PointXYZ & delta, geometry_msgs:
 }
 
 
-void Agent::setDepthView(const sensor_msgs::PointCloud2 pointCloud2){
-  tmpPointCloud2 = pointCloud2;
+void Agent::setDepthView(const sensor_msgs::PointCloud2 pointCloud2){ 
+  PCLPointCloud2 pcl_pc;
+  pcl_conversions::toPCL(pointCloud2, pcl_pc);
+  fromPCLPointCloud2(pcl_pc, cloud);
   existsPointCloud = true;
 }
 
@@ -158,6 +145,7 @@ void Agent::setOdometry(const geometry_msgs::PoseWithCovarianceStamped odometry)
       trajectories[currentTrajectory].stop();
       currentTrajectory = (++currentTrajectory)%(trajectories.size());
   }
+  odom = odometry;
   existsOdom = true;
 }
 
@@ -196,11 +184,62 @@ void Agent::showViews(const Mat & frontalDepthView, const Mat & topView, const v
 }
 
 bool Agent::watch(geometry_msgs::Twist & twist){
-  /*std::time_t now = std::time(nullptr);
-  if(now - INIT_TIME > 10){
-    twist.angular.z = 0.5f;
-    return true;
-  }*/
-  return false;
+    if(!existsPointCloud) return false;
+
+    std::time_t now = std::time(nullptr);
+    if(watchingState == 0 && (now - lastWatchEnding < TIME_BETWEEN_WATCH)) return false;
+
+
+    vector<Vec3f> circles;
+    double yaw = tf::getYaw(odom.pose.pose.orientation);
+    double yawBW = tf::getYaw(odomBeforeWatch.pose.pose.orientation);
+
+    if(watchingState != 2){
+        Mat topView;
+        PointXYZ delta;
+        Mat frontalDepthView;
+
+        buildViews(cloud, frontalDepthView, topView, delta);
+        detectTurtlebots(topView, circles);
+    }
+
+
+
+    switch(watchingState){
+      case 0:
+        if(now - lastWatchEnding >= TIME_BETWEEN_WATCH){
+          odomBeforeWatch = odom;
+          watchingState = 1; // turn on watch
+        }
+        break;
+      case 1: // watching
+        if(circles.size() > 0){
+          watchingState = 2; // go back
+        }
+        break;
+      case 2:
+        if(abs(yawBW - yaw) < (0.001f*M_PI)){
+          watchingState = 0; // stop watch
+          lastWatchEnding = now;
+        }
+    }
+
+
+    double r = M_PI/(FRAME_RATE*2);
+
+    switch(watchingState){
+      case 1:
+        twist.angular.z = r;
+        break;
+      case 2:
+        double a = yawBW - yaw;
+        twist.angular.z = a > r ? r : (a < -r ? -r : a);
+        break;
+    }
+
+
+   // cout << (yawBW - yaw) << " " << circles.size() << endl;
+
+    return watchingState != 0;
 }
 
