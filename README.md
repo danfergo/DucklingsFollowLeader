@@ -6,7 +6,7 @@ A ROS where a leader robot walks in a predefined trajectory and the remaining Tu
 
 For more information read the attached article, [here](https://github.com/danfergo/DucklingsFollowLeader/blob/master/Article%20-%20Ducklings%20Follow%20Leader.pdf)
 
-The source code consists of 4 packages:
+The source code consists on 4 packages:
 
 1. **ducklings_follower**, automatic following controllers
 2. **ducklings_gazebo**, a set of launch files to launch gazebo with world map and turtlebots
