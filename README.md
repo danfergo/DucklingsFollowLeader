@@ -4,7 +4,7 @@ A ROS where a leader robot walks in a predefined trajectory and the remaining Tu
 
 [![Ducklings Follow Leader Demo](https://img.youtube.com/vi/MRKCEkJYjbg/0.jpg)](https://www.youtube.com/watch?v=MRKCEkJYjbg)
 
-For more information read the attached article, [here](https://github.com/danfergo/DucklingsFollowLeader/blob/master/Article%20-%20Ducklings%20Follow%20Leader.pdf)
+For more information see the video demo above or read the attached article, [here](https://github.com/danfergo/DucklingsFollowLeader/blob/master/Article%20-%20Ducklings%20Follow%20Leader.pdf)
 
 The source code consists on 4 packages:
 
